@@ -1,0 +1,8 @@
+**
+!Dockerfile.api
+!requirements/api.txt
+!src/*.py
+!src/api/*.py
+!scripts/audit_image_hashes.py
+!scripts/prepare_splits.py
+!models/crop_model_v1.h5

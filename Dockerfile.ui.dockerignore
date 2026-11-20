@@ -1,0 +1,7 @@
+**
+!requirements/ui.txt
+!frontend/*.py
+!frontend/data/training-summary.json
+!src/__init__.py
+!src/schemas.py
+!.streamlit/config.toml

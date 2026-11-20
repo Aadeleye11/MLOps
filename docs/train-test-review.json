@@ -1,0 +1,116 @@
+[
+  {
+    "left": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Cashew/leaf miner/leaf miner1332_.jpg",
+    "right": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Cashew/leaf miner/leaf miner1333_.jpg",
+    "verdict": "likely_same_photo",
+    "evidence": "Vein pattern, midrib damage and background align."
+  },
+  {
+    "left": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Cassava/bacterial blight/bacterial blight1737_.jpg",
+    "right": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Cassava/bacterial blight/bacterial blight652_.jpg",
+    "verdict": "likely_same_photo",
+    "evidence": "Curved leaf edge, necrotic margin and background align."
+  },
+  {
+    "left": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Cassava/bacterial blight/bacterial blight987_.jpg",
+    "right": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Cassava/bacterial blight/bacterial blight1934_.jpg",
+    "verdict": "likely_same_photo",
+    "evidence": "Leaf tip, dark lesions and blurred background align."
+  },
+  {
+    "left": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Cassava/brown spot/brown spot34_.jpg",
+    "right": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Cassava/brown spot/brown spot372_.jpg",
+    "verdict": "likely_same_photo",
+    "evidence": "Individual lesions, edges and vein junctions align."
+  },
+  {
+    "left": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Cassava/brown spot/brown spot373_.jpg",
+    "right": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Cassava/brown spot/brown spot35_.jpg",
+    "verdict": "likely_same_photo",
+    "evidence": "Lesion positions and adjacent leaves align."
+  },
+  {
+    "left": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Cassava/mosaic/mosaic653_.jpg",
+    "right": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Cassava/mosaic/mosaic83_.jpg",
+    "verdict": "likely_same_photo",
+    "evidence": "Mottling, vein pattern and background align."
+  },
+  {
+    "left": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Tomato/leaf curl/leaf curl314_.jpg",
+    "right": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Tomato/leaf curl/leaf curl498_.jpg",
+    "verdict": "likely_same_photo",
+    "evidence": "Curled tips, cut stem and cast shadow align."
+  },
+  {
+    "left": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Tomato/leaf curl/leaf curl349_.jpg",
+    "right": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Tomato/leaf curl/leaf curl503_.jpg",
+    "verdict": "likely_same_photo",
+    "evidence": "Folded leaves, spots, handwriting and shadow align."
+  },
+  {
+    "left": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Tomato/verticulium wilt/verticulium wilt648_.jpg",
+    "right": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Tomato/verticulium wilt/verticulium wilt726_.jpg",
+    "verdict": "likely_same_photo",
+    "evidence": "Lesion, folded leaf tips and handwritten marks align."
+  },
+  {
+    "left": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Tomato/verticulium wilt/verticulium wilt704_.jpg",
+    "right": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Tomato/verticulium wilt/verticulium wilt647_.jpg",
+    "verdict": "likely_same_photo",
+    "evidence": "Tan patch, dark lesion and overlapping leaves align."
+  },
+  {
+    "left": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Tomato/leaf curl/leaf curl348_.jpg",
+    "right": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Tomato/leaf curl/leaf curl503_.jpg",
+    "verdict": "likely_same_photo",
+    "evidence": "Folded leaves, spots and handwriting align. Same test path as row 8."
+  },
+  {
+    "left": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Tomato/leaf curl/leaf curl302_.jpg",
+    "right": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Tomato/leaf curl/leaf curl304_.jpg",
+    "verdict": "likely_same_photo",
+    "evidence": "Dark leaf tip, leaf folds and handwriting align."
+  },
+  {
+    "left": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Tomato/leaf curl/leaf curl330_.jpg",
+    "right": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Tomato/leaf curl/leaf curl480_.jpg",
+    "verdict": "likely_same_photo",
+    "evidence": "Leaf folds, pointed tips and paper edge align."
+  },
+  {
+    "left": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Tomato/leaf blight/leaf blight1252_.jpg",
+    "right": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Tomato/leaf blight/leaf blight1251_.jpg",
+    "verdict": "likely_same_photo",
+    "evidence": "Yellow spots, curled brown portion and markings align."
+  },
+  {
+    "left": "rice/Rice Dataset/Original Dataset/Leaf Scald/LS_228.jpg",
+    "right": "rice/Rice Dataset/Original Dataset/Rice Stripes/RS_190.jpg",
+    "verdict": "likely_different",
+    "evidence": "The left blade shows a broad brown lesion absent on the right."
+  },
+  {
+    "left": "rice/Rice Dataset/Original Dataset/Rice Blast/RB_135.jpg",
+    "right": "rice/Rice Dataset/Original Dataset/Rice Blast/RB_545.jpg",
+    "verdict": "inconclusive",
+    "evidence": "Similar outline and faint veins provide few reliable landmarks."
+  },
+  {
+    "left": "rice/Rice Dataset/Original Dataset/Leaf Scald/LS_272.jpg",
+    "right": "rice/Rice Dataset/Original Dataset/Leaf Scald/LS_262.jpg",
+    "verdict": "inconclusive",
+    "evidence": "The central streak differs in visibility and the edge has few landmarks."
+  },
+  {
+    "left": "rice/Rice Dataset/Original Dataset/Leaf Scald/LS_35.jpg",
+    "right": "rice/Rice Dataset/Original Dataset/Rice Tungro/RT_82.jpg",
+    "verdict": "likely_different",
+    "evidence": "The left blade is split with a grey damaged surface. The right blade is intact."
+  },
+  {
+    "left": "rice/Rice Dataset/Original Dataset/Rice Blast/RB_121.jpg",
+    "right": "rice/Rice Dataset/Original Dataset/Rice Tungro/RT_80.jpg",
+    "verdict": "likely_different",
+    "evidence": "The left blade shows a localized brown spot. The right blade has a pinched outline."
+  }
+]

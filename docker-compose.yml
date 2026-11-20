@@ -1,0 +1,98 @@
+services:
+  db:
+    image: postgres:18-bookworm
+    environment:
+      POSTGRES_DB: leafvision
+      POSTGRES_USER: leafvision
+      POSTGRES_PASSWORD: ${LEAFVISION_DB_PASSWORD:?Set LEAFVISION_DB_PASSWORD in .env}
+    volumes:
+      - database:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "leafvision", "-d", "leafvision"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    image: leafvision-api:local
+    depends_on:
+      db:
+        condition: service_healthy
+    environment: &backend_environment
+      LEAFVISION_DATABASE_URL: "host=db dbname=leafvision user=leafvision"
+      PGPASSWORD: ${LEAFVISION_DB_PASSWORD:?Set LEAFVISION_DB_PASSWORD in .env}
+      LEAFVISION_UPLOAD_ROOT: /app/artifacts/uploads
+    volumes:
+      - api_files:/app/artifacts
+
+  proxy:
+    image: haproxy:3.2-alpine
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - ./deploy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    ports:
+      - "127.0.0.1:${LEAFVISION_API_PORT:-18000}:8000"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8000/health"]
+      interval: 15s
+      timeout: 5s
+      start_period: 20s
+      retries: 4
+
+  worker:
+    profiles: [training]
+    image: leafvision-api:local
+    pull_policy: never
+    command: ["python", "-m", "src.worker"]
+    depends_on:
+      api:
+        condition: service_healthy
+    environment: *backend_environment
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os, psycopg; psycopg.connect(os.environ['LEAFVISION_DATABASE_URL'], connect_timeout=3).execute('SELECT job_id FROM leafvision_training_job LIMIT 0')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    volumes:
+      - api_files:/app/artifacts
+      - type: bind
+        source: ./artifacts/best_crop_mobilenetv2.keras
+        target: /app/artifacts/best_crop_mobilenetv2.keras
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ./artifacts/archives
+        target: /app/artifacts/archives
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ./artifacts/splits
+        target: /app/artifacts/splits
+        read_only: true
+        bind:
+          create_host_path: false
+
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile.ui
+    image: leafvision-ui:local
+    depends_on:
+      proxy:
+        condition: service_healthy
+    environment:
+      LEAFVISION_API_URL: http://proxy:8000
+    ports:
+      - "127.0.0.1:${LEAFVISION_UI_PORT:-18501}:8501"
+
+volumes:
+  database:
+  api_files:

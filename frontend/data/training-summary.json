@@ -1,0 +1,172 @@
+{
+  "cashew": {
+    "images": 4584,
+    "brightness": {
+      "p10": 109.45295181274415,
+      "median": 131.17214965820312,
+      "p90": 155.97087707519532
+    },
+    "green_dominance": {
+      "p10": -9.225042724609375,
+      "median": 6.007965087890625,
+      "p90": 19.65939331054687
+    },
+    "edge_density": {
+      "p10": 3.360406720813441,
+      "median": 6.082212164424329,
+      "p90": 13.96242792485585
+    },
+    "near_white": {
+      "p10": 0.0,
+      "median": 0.0,
+      "p90": 4.630737304687499
+    },
+    "width": {
+      "p10": 400.0,
+      "median": 400.0,
+      "p90": 400.0
+    },
+    "height": {
+      "p10": 400.0,
+      "median": 400.0,
+      "p90": 400.0
+    },
+    "example_path": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Cashew/anthracnose/anthracnose1545_.jpg"
+  },
+  "cassava": {
+    "images": 5201,
+    "brightness": {
+      "p10": 108.36322021484375,
+      "median": 132.3763427734375,
+      "p90": 154.62139892578125
+    },
+    "green_dominance": {
+      "p10": -5.99127197265625,
+      "median": 13.552734375,
+      "p90": 34.27001953125
+    },
+    "edge_density": {
+      "p10": 3.6828073656147313,
+      "median": 6.770413540827082,
+      "p90": 11.891623783247567
+    },
+    "near_white": {
+      "p10": 0.0,
+      "median": 0.0,
+      "p90": 0.0
+    },
+    "width": {
+      "p10": 400.0,
+      "median": 400.0,
+      "p90": 400.0
+    },
+    "height": {
+      "p10": 400.0,
+      "median": 400.0,
+      "p90": 400.0
+    },
+    "example_path": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Cassava/green mite/green mite210_.jpg"
+  },
+  "maize": {
+    "images": 3579,
+    "brightness": {
+      "p10": 104.39425201416016,
+      "median": 126.22525787353516,
+      "p90": 158.21342773437502
+    },
+    "green_dominance": {
+      "p10": -6.59815673828125,
+      "median": 15.5994873046875,
+      "p90": 37.63647460937501
+    },
+    "edge_density": {
+      "p10": 1.5376030752061505,
+      "median": 5.573811147622295,
+      "p90": 14.715109430218863
+    },
+    "near_white": {
+      "p10": 0.0,
+      "median": 0.0,
+      "p90": 0.18310546875
+    },
+    "width": {
+      "p10": 400.0,
+      "median": 400.0,
+      "p90": 400.0
+    },
+    "height": {
+      "p10": 400.0,
+      "median": 400.0,
+      "p90": 400.0
+    },
+    "example_path": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Maize/streak virus/streak virus849_.jpg"
+  },
+  "rice": {
+    "images": 1912,
+    "brightness": {
+      "p10": 197.22162475585938,
+      "median": 228.09780883789062,
+      "p90": 242.9769058227539
+    },
+    "green_dominance": {
+      "p10": -2.110296630859375,
+      "median": 0.7296142578125,
+      "p90": 3.8383728027343764
+    },
+    "edge_density": {
+      "p10": 2.9090458180916365,
+      "median": 3.394506789013578,
+      "p90": 4.625209250418501
+    },
+    "near_white": {
+      "p10": 62.97912597656251,
+      "median": 82.672119140625,
+      "p90": 91.435546875
+    },
+    "width": {
+      "p10": 500.0,
+      "median": 1944.0,
+      "p90": 2944.0
+    },
+    "height": {
+      "p10": 500.0,
+      "median": 1944.0,
+      "p90": 2944.0
+    },
+    "example_path": "rice/Rice Dataset/Original Dataset/Rice Blast/RB_247.jpg"
+  },
+  "tomato": {
+    "images": 3829,
+    "brightness": {
+      "p10": 106.80874786376953,
+      "median": 132.3422393798828,
+      "p90": 157.02152709960941
+    },
+    "green_dominance": {
+      "p10": -15.94210205078125,
+      "median": -6.29888916015625,
+      "p90": 4.093457031250002
+    },
+    "edge_density": {
+      "p10": 3.515407030814062,
+      "median": 5.189410378820758,
+      "p90": 7.588815177630355
+    },
+    "near_white": {
+      "p10": 0.0,
+      "median": 0.0,
+      "p90": 0.0
+    },
+    "width": {
+      "p10": 400.0,
+      "median": 400.0,
+      "p90": 400.0
+    },
+    "height": {
+      "p10": 400.0,
+      "median": 400.0,
+      "p90": 400.0
+    },
+    "example_path": "ccmt/Dataset for Crop Pest and Disease Detection/Raw Data/CCMT Dataset/Tomato/healthy/healthy430_.jpg"
+  }
+}
