@@ -14,7 +14,7 @@ LeafVision classifies a leaf photo as cashew, cassava, maize, rice, or tomato. I
 | Live application | [FastAPI endpoints](src/api/main.py), [background worker](src/worker.py), [Streamlit dashboard](frontend/app.py) and [Docker Compose](docker-compose.yml) |
 | Verification | [Automated tests](tests/) and [development verification scripts](scripts/verification/) |
 
-**Submission status.** The configured [GitHub repository](https://github.com/Aadeleye11/MLOps) is the destination for the code. The public Azure URL, YouTube demo and Locust flood-test results are pending. The [local replica results](#check-routing-across-one-two-and-three-api-containers) cover routing, promotion and rollback. Submission attempt 1 takes the code repository ZIP. Attempt 2 takes the GitHub repository URL.
+**Submission status.** The configured [GitHub repository](https://github.com/Aadeleye11/MLOps) is the destination for the code. The public Azure URL and YouTube demo are pending. The [local replica checks](#check-routing-across-one-two-and-three-api-containers) cover routing, promotion and rollback. The [Locust results](#locust-prediction-load-test) compare throughput and response time under concurrency. Submission attempt 1 takes the code repository ZIP. Attempt 2 takes the GitHub repository URL.
 
 ## Run the first prediction
 
@@ -324,7 +324,31 @@ The local verification used `tomato-308.jpg` from the labeled upload batch to ma
 | 3 | Promoted `7ea0b21d-b4e2-443c-91bf-6b513c1d35b5` | 3 / 3 / 3 | 0.951961339 |
 | 3 | Restored baseline | 3 / 3 / 3 | 0.927661240 |
 
-These sequential requests verify routing and version consistency. The planned Locust study will measure throughput and latency under concurrency.
+## Locust prediction load test
+
+On 23 November 2026, all **3,103 measured predictions** returned HTTP 200, the expected rice label and score, the baseline model version and a backend identifier. Each active API replica handled successful predictions in every trial. The highest combined throughput was **9.86 requests/s with three API containers and four users**.
+
+Locust 2.47.0 sent the same 486,732-byte labeled JPEG (`artifacts/HL_423.jpg`) through HAProxy to `POST /predict` with no pause between responses and the next upload. The generator, PostgreSQL, proxy and API containers shared one Zorin OS 18.1 laptop with an Intel Core i5-8250U (4 physical cores, 8 logical CPUs) and 7.65 GiB RAM. Every API container used one Uvicorn process and two TensorFlow intra-op and inter-op threads. The isolated stack used `crop_model_v1` and ran inference throughout.
+
+Each combination had two 30-second runs, each preceded by a separate five-second warm-up at the same concurrency. The table combines completed requests and divides by the sum of the two Locust measurement intervals for requests/s. Mean latency is weighted by request count. Median and p95 are the client-observed Locust values for trial 1 / trial 2. Warm-ups are excluded.
+
+| API containers | Users | Requests | Failures | Requests/s | Mean (ms) | Median (ms) | p95 (ms) |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | 1 | 300 | 0 | 5.03 | 199 | 180 / 200 | 260 / 270 |
+| 1 | 4 | 206 | 0 | 3.42 | 1,166 | 1,100 / 1,200 | 1,300 / 1,400 |
+| 1 | 8 | 204 | 0 | 3.28 | 2,409 | 2,300 / 2,400 | 3,200 / 3,200 |
+| 2 | 1 | 289 | 0 | 4.85 | 206 | 200 / 200 | 240 / 290 |
+| 2 | 4 | 437 | 0 | 7.26 | 548 | 530 / 530 | 700 / 910 |
+| 2 | 8 | 340 | 0 | 5.49 | 1,437 | 1,500 / 1,400 | 2,600 / 2,600 |
+| 3 | 1 | 290 | 0 | 4.85 | 206 | 200 / 200 | 270 / 260 |
+| 3 | 4 | 591 | 0 | 9.86 | 404 | 400 / 370 | 580 / 540 |
+| 3 | 8 | 446 | 0 | 7.26 | 1,087 | 430 / 390 | 3,100 / 2,600 |
+
+At four users, going from one to three API containers nearly tripled throughput and cut mean latency from 1,166 to 404 ms. At eight users, the third container increased throughput over two containers, while p95 was 3.1 and 2.6 seconds versus 2.6 seconds in both two-container runs. Adding replicas also used more RAM. The peak sampled combined API working set at eight users rose from 729 MiB with one container to 1,603 MiB with three. These short runs used one repeated photo on a shared laptop. Public network latency, other photos and cloud hardware can change the result.
+
+![Locust throughput and p95 latency by replica count and concurrent users. Whiskers span the two trial values.](load_testing/results/2026-11-23-local/scaling.png)
+
+[Reproduce the benchmark](load_testing/README.md) · [All 18 trials, including p99, CPU and memory](load_testing/results/2026-11-23-local/trials.csv)
 
 ## Use the crop prediction dashboard
 
