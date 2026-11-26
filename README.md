@@ -2,7 +2,7 @@
 
 Upload a leaf photo to identify its crop: **cashew, cassava, maize, rice, or tomato**. The dashboard also shows dataset trends and API uptime. An operator can upload labeled photos, retrain the model, and compare the candidate with the current version before promoting it.
 
-**[Open the live LeafVision dashboard](https://leafvision-51-21-251-72.sslip.io)** for recording and grading through December 26, 2026 at 17:50 UTC. Anyone can try a leaf prediction. Labeled uploads and retraining require the operator token. The YouTube recording is pending. [Cloud demo results](docs/technical-guide.md#cloud-retraining-on-aws) · [Video script](docs/demo.md) · [GitHub repository](https://github.com/Aadeleye11/MLOps)
+**[Open the live LeafVision dashboard](https://leafvision-51-21-251-72.sslip.io)** for recording and grading through December 26, 2026 at 17:50 UTC. Anyone can try a leaf prediction. Labeled uploads and retraining require the operator token. The YouTube recording is pending.
 
 ## Run locally
 
