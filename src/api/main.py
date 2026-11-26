@@ -2,6 +2,7 @@
 
 import os
 from contextlib import asynccontextmanager
+from hmac import compare_digest
 from pathlib import Path
 from threading import Lock
 from time import monotonic, perf_counter
@@ -9,7 +10,8 @@ from uuid import UUID
 
 import psycopg
 from psycopg.rows import dict_row
-from fastapi import FastAPI, Form, HTTPException, Request, Response, UploadFile
+from fastapi import APIRouter, Depends, FastAPI, Form, HTTPException, Request, Response, UploadFile
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
 
 from src import CROP_CLASSES
@@ -68,6 +70,24 @@ async def lifespan(application: FastAPI):
 
 app = FastAPI(title="LeafVision Crop API", lifespan=lifespan)
 app.add_middleware(PredictionTimingMiddleware)
+
+
+def require_operator(credentials: HTTPAuthorizationCredentials | None = Depends(HTTPBearer(auto_error=False))):
+    expected = os.environ.get("LEAFVISION_OPERATOR_TOKEN")
+    if not expected or not expected.strip():
+        raise HTTPException(status_code=503, detail="Operator access is not configured")
+    if credentials is None or not compare_digest(credentials.credentials.encode(), expected.encode()):
+        raise HTTPException(status_code=401, detail="Enter a valid operator token",
+                            headers={"WWW-Authenticate": "Bearer"})
+
+
+operator = APIRouter(dependencies=[Depends(require_operator)])
+
+
+@operator.get("/operator/access", status_code=204)
+def operator_access():
+    """Let the dashboard verify the operator before enabling controls."""
+    return Response(status_code=204)
 
 
 def ready_state(request: Request):
@@ -148,7 +168,7 @@ def upload_store(request: Request) -> UploadStore:
     return store
 
 
-@app.post("/data/upload", status_code=201)
+@operator.post("/data/upload", status_code=201)
 def upload_batch(request: Request, files: list[UploadFile], crop: str = Form()) -> UploadReceipt:
     store = upload_store(request)
     if crop not in CROP_CLASSES:
@@ -194,7 +214,7 @@ def list_batches(request: Request):
     return upload_store(request).list_batches()
 
 
-@app.post("/train/retrain", status_code=202)
+@operator.post("/train/retrain", status_code=202)
 def request_retraining(request: Request, body: RetrainingRequest, response: Response):
     job = enqueue(upload_store(request).database_url, body.batch_id)
     if job is None:
@@ -222,11 +242,14 @@ def switch_model(request, body, job_id=None):
         raise HTTPException(status_code=409, detail=str(error)) from error
 
 
-@app.post("/model/versions/{job_id}/promote")
+@operator.post("/model/versions/{job_id}/promote")
 def promote_model(request: Request, job_id: UUID, body: VersionChange):
     return switch_model(request, body, job_id)
 
 
-@app.post("/model/rollback")
+@operator.post("/model/rollback")
 def rollback_model(request: Request, body: VersionChange):
     return switch_model(request, body)
+
+
+app.include_router(operator)

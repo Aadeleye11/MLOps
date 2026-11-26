@@ -1,0 +1,19 @@
+services:
+  https:
+    image: caddy:2-alpine
+    depends_on:
+      ui:
+        condition: service_healthy
+    environment:
+      LEAFVISION_HOST: ${LEAFVISION_HOST:?Set LEAFVISION_HOST to the dashboard hostname}
+    ports:
+      - "${LEAFVISION_HTTP_BIND:-80}:80"
+      - "${LEAFVISION_HTTPS_BIND:-443}:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:

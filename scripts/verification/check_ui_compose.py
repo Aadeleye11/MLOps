@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from uuid import UUID
 
@@ -20,6 +21,7 @@ print("Prediction:", app.metric[0].value, app.metric[1].value, app.text[0].value
 app.switch_page("dataset_insights.py").run()
 assert not app.exception and not app.error, (app.exception, app.error)
 app.switch_page("bulk_upload.py").run()
+app.text_input(key="operator_token").set_value(os.environ["LEAFVISION_OPERATOR_TOKEN"]).run()
 assert [m.value for m in app.metric] == ["0", "0"]
 app.selectbox[0].select("tomato")
 app.file_uploader[0].set_value([fixture("tomato-259.jpg"), fixture("tomato-308.jpg")]).run()

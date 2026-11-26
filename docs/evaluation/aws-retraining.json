@@ -1,0 +1,154 @@
+{
+  "region": "eu-north-1",
+  "instance_type": "m7i-flex.large",
+  "batch_id": "723e60b1-ce89-4504-8f89-61e51e98d94e",
+  "job": {
+    "job_id": "eb1ed672-be59-4a58-8465-ab1806fc71f9",
+    "batch_id": "723e60b1-ce89-4504-8f89-61e51e98d94e",
+    "status": "succeeded",
+    "stage": null,
+    "created_at": "2026-11-26T10:14:12.923453+00:00",
+    "started_at": "2026-11-26T10:14:13.748129+00:00",
+    "finished_at": "2026-11-26T10:16:07.284637+00:00",
+    "result": {
+      "baseline": {
+        "images": 3933,
+        "correct": 3900,
+        "support": {
+          "rice": 399,
+          "maize": 730,
+          "cashew": 982,
+          "tomato": 734,
+          "cassava": 1088
+        },
+        "accuracy": 0.9916094584286804,
+        "macro_f1": 0.9926752299740071,
+        "macro_recall": 0.993322517488213,
+        "macro_precision": 0.9920823090576706,
+        "confusion_matrix": [
+          [
+            978,
+            0,
+            4,
+            0,
+            0
+          ],
+          [
+            9,
+            1065,
+            5,
+            0,
+            9
+          ],
+          [
+            0,
+            0,
+            730,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            399,
+            0
+          ],
+          [
+            1,
+            4,
+            1,
+            0,
+            728
+          ]
+        ],
+        "mean_cross_entropy": 0.029063468372418418
+      },
+      "candidate_sha256": "5319b8b876bc76c22e09b3aa6ef07c5baace2dd121cdd184539d5ba2211225f3",
+      "candidate_metrics": {
+        "images": 3933,
+        "correct": 3902,
+        "support": {
+          "rice": 399,
+          "maize": 730,
+          "cashew": 982,
+          "tomato": 734,
+          "cassava": 1088
+        },
+        "accuracy": 0.9921179760996695,
+        "macro_f1": 0.9930559947374643,
+        "macro_recall": 0.9936703220886682,
+        "macro_precision": 0.9924843293727299,
+        "confusion_matrix": [
+          [
+            977,
+            0,
+            5,
+            0,
+            0
+          ],
+          [
+            7,
+            1068,
+            4,
+            0,
+            9
+          ],
+          [
+            0,
+            0,
+            730,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            399,
+            0
+          ],
+          [
+            1,
+            4,
+            1,
+            0,
+            728
+          ]
+        ],
+        "mean_cross_entropy": 0.027853876639301656
+      },
+      "candidate_version": "eb1ed672-be59-4a58-8465-ab1806fc71f9",
+      "checkpoint_sha256": "9bb1658122b2383ddb111dc35cfdb6b713e92954776ee5e67d0bff899f4b9d21",
+      "max_reload_score_difference": 0.0
+    },
+    "error": null
+  },
+  "uploaded_crop": "tomato",
+  "verified_upload_files": 2,
+  "original_replay_images": 100,
+  "validation_images": 3933,
+  "policy": {
+    "epochs": 1,
+    "trainable_layer": "dense_8",
+    "optimizer": "Adam",
+    "learning_rate": 0.0001,
+    "batch_size": 16,
+    "original_images_per_crop": 20,
+    "seed": 42
+  },
+  "max_head_kernel_change": 0.0005528181791305542,
+  "candidate_meets_promotion_criteria": true,
+  "active_model": "crop_model_v1",
+  "prediction_monitoring": {
+    "uptime_seconds": 332.562,
+    "model_version": "crop_model_v1",
+    "requests": 1,
+    "failures": 0,
+    "latency_samples": 1,
+    "latency_window": 100,
+    "mean_ms": 255.69407699998692,
+    "p95_ms": 255.69407699998692,
+    "recent_failures": []
+  }
+}

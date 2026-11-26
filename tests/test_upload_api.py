@@ -22,6 +22,10 @@ from src.worker import process_one
 from src.registry import V1_SOURCE, training_checkpoint
 
 
+TEST_TOKEN = "test-operator-token"
+OPERATOR_HEADERS = {"Authorization": f"Bearer {TEST_TOKEN}"}
+
+
 def jpeg(color):
     output = io.BytesIO()
     Image.new("RGB", (16, 12), color).save(output, format="JPEG")
@@ -43,6 +47,7 @@ class UploadAPITest(unittest.IsolatedAsyncioTestCase):
         self.root = Path(uploads.name)
         env = patch.dict(os.environ, {
             "LEAFVISION_DATABASE_URL": self.database,
+            "LEAFVISION_OPERATOR_TOKEN": TEST_TOKEN,
             "LEAFVISION_UPLOAD_ROOT": str(self.root),
         })
         self.addCleanup(env.stop)
@@ -57,7 +62,8 @@ class UploadAPITest(unittest.IsolatedAsyncioTestCase):
             connection.execute(sql.SQL("DROP SCHEMA {} CASCADE").format(schema))
 
     def client(self):
-        return httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test")
+        return httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test",
+                                 headers=OPERATOR_HEADERS)
 
     async def upload(self, client, *images, crop="rice"):
         files = [("files", (f"leaf-{index}.jpg", data, "image/jpeg"))
@@ -65,12 +71,18 @@ class UploadAPITest(unittest.IsolatedAsyncioTestCase):
         return await client.post("/data/upload", data={"crop": crop}, files=files)
 
     def test_dashboard_saves_batch_refreshes_counts_and_handles_duplicate(self):
-        ui = AppTest.from_file("../frontend/app.py").run()
+        ui = AppTest.from_file("../frontend/app.py", default_timeout=30).run()
         images = [jpeg("green"), jpeg("yellow")]
         with TestClient(app) as api, patch("httpx.get", side_effect=api.get), patch("httpx.post", side_effect=api.post) as post:
             ui.switch_page("bulk_upload.py").run()
             self.assertFalse(ui.exception)
             self.assertTrue(ui.button[0].disabled)
+            self.assertTrue(ui.file_uploader[0].disabled)
+            ui.text_input(key="operator_token").set_value("incorrect").run()
+            self.assertTrue(ui.button[0].disabled)
+            self.assertTrue(ui.file_uploader[0].disabled)
+            ui.text_input(key="operator_token").set_value(TEST_TOKEN).run()
+            self.assertFalse(ui.file_uploader[0].disabled)
             ui.selectbox[0].select("maize")
             ui.file_uploader[0].set_value([(f"leaf-{i}.jpg", data, "image/jpeg")
                                            for i, data in enumerate(images)]).run()
@@ -94,17 +106,19 @@ class UploadAPITest(unittest.IsolatedAsyncioTestCase):
             self.assertEqual([m.value for m in ui.metric], ["1", "2"])
 
     def test_dashboard_tracks_latest_job_for_selected_batch_and_shows_failure(self):
-        ui = AppTest.from_file("../frontend/app.py").run()
+        ui = AppTest.from_file("../frontend/app.py", default_timeout=30).run()
         with TestClient(app) as api, patch("httpx.get", side_effect=api.get), patch("httpx.post", side_effect=api.post) as post:
             ui.switch_page("retraining.py").run()
             self.assertFalse(ui.exception)
             self.assertFalse(ui.button)
-            rice = api.post("/data/upload", data={"crop": "rice"},
+            rice = api.post("/data/upload", headers=OPERATOR_HEADERS, data={"crop": "rice"},
                             files={"files": ("a.jpg", jpeg("green"), "image/jpeg")}).json()["batch_id"]
-            maize = api.post("/data/upload", data={"crop": "maize"},
+            maize = api.post("/data/upload", headers=OPERATOR_HEADERS, data={"crop": "maize"},
                              files={"files": ("b.jpg", jpeg("yellow"), "image/jpeg")}).json()["batch_id"]
             ui.run()
             ui.selectbox[0].set_value(rice).run()
+            self.assertTrue(ui.button[0].disabled)
+            ui.text_input(key="operator_token").set_value(TEST_TOKEN).run()
             ui.button[0].click().run()
             self.assertTrue(ui.button[0].disabled)
             job_id = ui.code[1].value
@@ -188,7 +202,7 @@ class UploadAPITest(unittest.IsolatedAsyncioTestCase):
             self.assertFalse(process_one(app.state.upload_store, self.root))
 
     def test_dashboard_promotion_and_rollback_use_the_displayed_version(self):
-        ui = AppTest.from_file("../frontend/app.py").run()
+        ui = AppTest.from_file("../frontend/app.py", default_timeout=30).run()
         with (
             TestClient(app) as api,
             patch("httpx.get", side_effect=api.get),
@@ -196,9 +210,9 @@ class UploadAPITest(unittest.IsolatedAsyncioTestCase):
             patch("src.api.main.ARTIFACTS", self.root),
             patch("src.registry.load_crop_model"),
         ):
-            batch_id = api.post("/data/upload", data={"crop": "rice"},
+            batch_id = api.post("/data/upload", headers=OPERATOR_HEADERS, data={"crop": "rice"},
                                 files={"files": ("a.jpg", jpeg("green"), "image/jpeg")}).json()["batch_id"]
-            job_id = api.post("/train/retrain", json={"batch_id": batch_id}).json()["job_id"]
+            job_id = api.post("/train/retrain", headers=OPERATOR_HEADERS, json={"batch_id": batch_id}).json()["job_id"]
             candidate = self.root / "retraining" / job_id / "candidate.keras"
             candidate.parent.mkdir(parents=True)
             candidate.write_bytes(b"candidate")
@@ -212,6 +226,8 @@ class UploadAPITest(unittest.IsolatedAsyncioTestCase):
 
             ui.switch_page("retraining.py").run()
             promote = f"promote_{job_id}"
+            self.assertTrue(ui.button(key=promote).disabled)
+            ui.text_input(key="operator_token").set_value(TEST_TOKEN).run()
             ui.button(key=promote).click().run()
             self.assertEqual(ui.error[0].value, "Validation macro F1 must improve")
             self.assertEqual(ui.code[0].value, "crop_model_v1")
@@ -223,8 +239,12 @@ class UploadAPITest(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(ui.code[0].value, job_id)
             self.assertTrue(ui.button(key=promote).disabled)
 
+            ui.text_input(key="operator_token").set_value("").run()
+            self.assertTrue(ui.button(key="rollback").disabled)
+            ui.text_input(key="operator_token").set_value(TEST_TOKEN).run()
+
             # A different client restores the baseline while this browser still displays the candidate.
-            api.post("/model/rollback", json={"expected_active": job_id}).raise_for_status()
+            api.post("/model/rollback", headers=OPERATOR_HEADERS, json={"expected_active": job_id}).raise_for_status()
             ui.button(key="rollback").click().run()
             self.assertEqual(post.call_args.kwargs["json"], {"expected_active": job_id})
             self.assertIn("Active version is crop_model_v1", ui.error[0].value)

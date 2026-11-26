@@ -10,6 +10,7 @@ from pathlib import Path
 import embedded_postgres
 import httpx
 
+headers = {"Authorization": f"Bearer {os.environ['LEAFVISION_OPERATOR_TOKEN']}"}
 root = Path("artifacts").resolve()
 candidate = "3bd92605-8a72-44dd-9810-3b2d235234c1"
 baseline = "crop_model_v1"
@@ -57,12 +58,12 @@ with embedded_postgres.get_server(root / "retraining-inputs/pgdata") as db, Exit
     clients = [stack.enter_context(replica(db.get_uri())) for _ in range(2)]
     verify(clients, baseline, 0.92766124)
     control = clients[0]
-    response = control.post(f"/model/versions/{candidate}/promote", json={"expected_active": baseline})
+    response = control.post(f"/model/versions/{candidate}/promote", headers=headers, json={"expected_active": baseline})
     response.raise_for_status()
     try:
         verify(clients, candidate, 0.95196134)
-        assert control.post("/model/rollback", json={"expected_active": baseline}).status_code == 409
+        assert control.post("/model/rollback", headers=headers, json={"expected_active": baseline}).status_code == 409
     finally:
-        response = control.post("/model/rollback", json={"expected_active": candidate})
+        response = control.post("/model/rollback", headers=headers, json={"expected_active": candidate})
         response.raise_for_status()
     verify(clients, baseline, 0.92766124)

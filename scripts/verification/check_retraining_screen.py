@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import json
 import time
@@ -12,6 +13,7 @@ with httpx.Client(base_url="http://127.0.0.1:8000", trust_env=False, timeout=15)
     previous = next(b["latest_job_id"] for b in client.get("/data/batches").json() if b["batch_id"] == batch)
     app = AppTest.from_file(str(root / "frontend/app.py"), default_timeout=30).run()
     app.switch_page("retraining.py").run()
+    app.text_input(key="operator_token").set_value(os.environ["LEAFVISION_OPERATOR_TOKEN"]).run()
     assert not app.exception and not app.error, (app.exception, app.error)
     app.selectbox[0].set_value(batch).run()
     assert not app.button[0].disabled

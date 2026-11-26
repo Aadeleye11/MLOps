@@ -11,6 +11,7 @@ from zipfile import ZipFile
 import embedded_postgres
 import httpx
 
+headers = {"Authorization": f"Bearer {os.environ['LEAFVISION_OPERATOR_TOKEN']}"}
 artifacts = Path("artifacts").resolve()
 batch_id = "0f02ff9d-2e51-42a4-a24f-b52879cff427"
 with tempfile.TemporaryDirectory() as tmp, embedded_postgres.get_server(artifacts / "retraining-inputs/pgdata") as db:
@@ -35,12 +36,12 @@ with tempfile.TemporaryDirectory() as tmp, embedded_postgres.get_server(artifact
                     pass
                 time.sleep(0.2)
             start = time.monotonic()
-            request = api.post("/train/retrain", json={"batch_id": batch_id})
+            request = api.post("/train/retrain", headers=headers, json={"batch_id": batch_id})
             request.raise_for_status()
             assert request.status_code == 202 and request.json()["status"] == "queued"
             url = request.headers["Location"]
             print("Accepted", request.json(), "in", round(time.monotonic() - start, 3), "s", flush=True)
-            assert api.post("/train/retrain", json={"batch_id": batch_id}).headers["Location"] == url
+            assert api.post("/train/retrain", headers=headers, json={"batch_id": batch_id}).headers["Location"] == url
             worker = subprocess.Popen([sys.executable, "-m", "src.worker", "--once"], env=env)
             stages = set()
             for i in range(1200):

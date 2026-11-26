@@ -1,0 +1,3 @@
+{$LEAFVISION_HOST} {
+	reverse_proxy ui:8501
+}

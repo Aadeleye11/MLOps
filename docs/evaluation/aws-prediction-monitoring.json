@@ -1,0 +1,11 @@
+{
+    "uptime_seconds": 56.659,
+    "model_version": "crop_model_v1",
+    "requests": 1,
+    "failures": 0,
+    "latency_samples": 1,
+    "latency_window": 100,
+    "mean_ms": 241.3167180000073,
+    "p95_ms": 241.3167180000073,
+    "recent_failures": []
+}

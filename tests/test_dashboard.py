@@ -14,7 +14,7 @@ class DashboardTest(unittest.TestCase):
     def test_insights_charts_show_training_summary_and_link_back_to_prediction(self):
         frontend = Path(__file__).resolve().parents[1] / "frontend"
         summary = json.loads((frontend / "data/training-summary.json").read_text())
-        app = AppTest.from_file(str(frontend / "app.py")).run()
+        app = AppTest.from_file(str(frontend / "app.py"), default_timeout=30).run()
         app.switch_page("dataset_insights.py").run()
         self.assertFalse(app.exception)
         self.assertEqual(app.title[0].value, "Dataset insights")
@@ -29,7 +29,7 @@ class DashboardTest(unittest.TestCase):
         self.assertEqual(app.file_uploader[0].label, "Leaf photo")
 
     def test_result_belongs_to_selected_photo_and_failed_retry_clears_it(self):
-        app = AppTest.from_file("../frontend/app.py").run()
+        app = AppTest.from_file("../frontend/app.py", default_timeout=30).run()
         self.assertTrue(app.button[0].disabled)
         jpeg = io.BytesIO()
         Image.new("RGB", (16, 16), "green").save(jpeg, format="JPEG")

@@ -1,3 +1,8 @@
+x-backend-environment: &backend_environment
+  LEAFVISION_DATABASE_URL: "host=db dbname=leafvision user=leafvision"
+  PGPASSWORD: ${LEAFVISION_DB_PASSWORD:?Set LEAFVISION_DB_PASSWORD in .env}
+  LEAFVISION_UPLOAD_ROOT: /app/artifacts/uploads
+
 services:
   db:
     image: postgres:18-bookworm
@@ -21,10 +26,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    environment: &backend_environment
-      LEAFVISION_DATABASE_URL: "host=db dbname=leafvision user=leafvision"
-      PGPASSWORD: ${LEAFVISION_DB_PASSWORD:?Set LEAFVISION_DB_PASSWORD in .env}
-      LEAFVISION_UPLOAD_ROOT: /app/artifacts/uploads
+    environment:
+      <<: *backend_environment
+      LEAFVISION_OPERATOR_TOKEN: ${LEAFVISION_OPERATOR_TOKEN:-}
     volumes:
       - api_files:/app/artifacts
 

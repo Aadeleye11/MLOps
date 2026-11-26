@@ -1,6 +1,6 @@
 import hashlib
-import io
 import os
+import secrets
 import socket
 import subprocess
 import sys
@@ -12,7 +12,6 @@ from pathlib import Path
 import embedded_postgres
 import httpx
 import psycopg
-from PIL import Image
 
 
 @contextmanager
@@ -26,7 +25,8 @@ def running_api(environment, logs):
         process = subprocess.Popen(command, env=environment, stdout=log, stderr=log)
         try:
             with httpx.Client(base_url=f"http://127.0.0.1:{port}", timeout=15, trust_env=False) as client:
-                for _ in range(250):
+                deadline = time.monotonic() + 180
+                while time.monotonic() < deadline:
                     if process.poll() is not None:
                         raise RuntimeError(logs.read_text())
                     try:
@@ -51,23 +51,30 @@ with tempfile.TemporaryDirectory(prefix="leafvision-db-") as directory:
         env = {**os.environ, "LEAFVISION_TEST_DATABASE_URL": database}
         subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"],
                        env=env, check=True)
-        env.update(LEAFVISION_DATABASE_URL=database, LEAFVISION_UPLOAD_ROOT=str(root / "uploads"))
-        images = []
-        for color in ("green", "blue"):
-            buffer = io.BytesIO()
-            Image.new("RGB", (32, 24), color).save(buffer, format="JPEG")
-            images.append(buffer.getvalue())
-        entries = [("files", (f"leaf-{i}.jpg", data, "image/jpeg")) for i, data in enumerate(images)]
+        env.update(LEAFVISION_DATABASE_URL=database, LEAFVISION_UPLOAD_ROOT=str(root / "uploads"),
+                   LEAFVISION_OPERATOR_TOKEN=secrets.token_hex(32))
+        headers = {"Authorization": f"Bearer {env['LEAFVISION_OPERATOR_TOKEN']}"}
+        fixtures = Path("artifacts/retraining-inputs")
+        entries = [("files", (name, (fixtures / name).read_bytes(), "image/jpeg"))
+                   for name in ("tomato-259.jpg", "tomato-308.jpg")]
         with running_api(env, root / "before.log") as client:
-            response = client.post("/data/upload", files=entries, data={"crop": "rice"})
+            sample = Path("artifacts/HL_423.jpg")
+            prediction = client.post("/predict", files={"file": (sample.name, sample.read_bytes(), "image/jpeg")})
+            assert prediction.raise_for_status().json()["crop"] == "rice"
+            denied = client.post("/data/upload", files=entries, data={"crop": "tomato"})
+            assert denied.status_code == 401
+            response = client.post("/data/upload", headers=headers, files=entries, data={"crop": "tomato"})
             assert response.status_code == 201, response.text
             batch_id = response.json()["batch_id"]
+            job = client.post("/train/retrain", headers=headers, json={"batch_id": batch_id})
+            assert job.status_code == 202 and job.json()["status"] == "queued"
+            print("Public rice prediction passed. Operator saved two JPEGs and queued a retraining job.")
         with running_api(env, root / "after.log") as client:
             response = client.get(f"/data/batches/{batch_id}")
             assert response.status_code == 200, response.text
             batch = response.json()
-            assert batch["crop"] == "rice" and len(batch["images"]) == 2
-            by_hash = {hashlib.sha256(image).hexdigest(): image for image in images}
+            assert batch["crop"] == "tomato" and len(batch["images"]) == 2
+            by_hash = {hashlib.sha256(image).hexdigest(): image for _, (_, image, _) in entries}
             for image in batch["images"]:
                 assert (root / "uploads" / image["storage_path"]).read_bytes() == by_hash[image["sha256"]]
         with psycopg.connect(database) as connection:

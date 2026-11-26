@@ -1,6 +1,6 @@
 # Reproduce the local prediction benchmark
 
-Run from the repository root on a Linux Docker host with systemd cgroup v2. The trial runner reads per-container CPU and memory counters in `/sys/fs/cgroup/system.slice/docker-<id>.scope`. Docker Compose and the benchmark run on the same host. Prepare the [original labeled rice JPEG](../README.md#run-the-first-prediction) at `artifacts/HL_423.jpg`. The workload verifies its SHA-256 before use.
+Run from the repository root on a Linux Docker host with systemd cgroup v2. The trial runner reads per-container CPU and memory counters in `/sys/fs/cgroup/system.slice/docker-<id>.scope`. Docker Compose and the benchmark run on the same host. Prepare the [original labeled rice JPEG](../docs/technical-guide.md#run-the-first-prediction) at `artifacts/HL_423.jpg`. The workload verifies its SHA-256 before use.
 
 Create a separate Python 3.12 environment for Locust. The plotting command uses the project's regular Python environment with Matplotlib installed.
 
@@ -9,7 +9,7 @@ python3.12 -m venv .venv/locust
 .venv/locust/bin/python -m pip install -r load_testing/requirements.txt
 ```
 
-The example below uses one isolated Compose project, the same baseline image at every scale, and an API proxy bound to localhost on port 18090. Set `LEAFVISION_DB_PASSWORD` as described in the [Compose setup](../README.md#run-the-dashboard-api-and-postgresql-with-docker-compose). Only the proxy, API and PostgreSQL services are needed. Keep the test machine available for the full matrix.
+The example below uses one isolated Compose project, the same baseline image at every scale, and an API proxy bound to localhost on port 18090. Set `LEAFVISION_DB_PASSWORD` as described in the [Compose setup](../docs/technical-guide.md#run-the-dashboard-api-and-postgresql-with-docker-compose). Only the proxy, API and PostgreSQL services are needed. Keep the test machine available for the full matrix.
 
 ```bash
 export COMPOSE_PROJECT_NAME=leafvision-locust

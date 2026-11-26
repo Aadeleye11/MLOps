@@ -1,3 +1,4 @@
+import os
 import time
 from pathlib import Path
 from uuid import UUID
@@ -12,6 +13,7 @@ def clean(app):
 
 app = AppTest.from_file("/app/frontend/app.py", default_timeout=60).run()
 app.switch_page("bulk_upload.py").run()
+app.text_input(key="operator_token").set_value(os.environ["LEAFVISION_OPERATOR_TOKEN"]).run()
 clean(app)
 photos = [Path("/tmp") / name for name in ("tomato-259.jpg", "tomato-308.jpg")]
 app.selectbox[0].select("tomato")

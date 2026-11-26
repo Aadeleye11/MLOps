@@ -39,6 +39,31 @@ class PredictionAPITest(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(response.json()["model_version"], "crop_model_v1")
             load.assert_called_once_with(path)
 
+    async def test_operator_actions_require_a_configured_matching_bearer_token(self):
+        job_id = "00000000-0000-4000-8000-000000000001"
+        change = {"json": {"expected_active": "crop_model_v1"}}
+        routes = [
+            ("GET", "/operator/access", {}),
+            ("POST", "/data/upload", {"files": {"files": ("leaf.jpg", b"test")}, "data": {"crop": "rice"}}),
+            ("POST", "/train/retrain", {"json": {"batch_id": job_id}}),
+            ("POST", f"/model/versions/{job_id}/promote", change),
+            ("POST", "/model/rollback", change),
+        ]
+        async with self.client() as client:
+            for method, path, body in routes:
+                with self.subTest(path=path), patch.dict(os.environ, LEAFVISION_OPERATOR_TOKEN=""):
+                    result = await client.request(method, path, headers={"Authorization": "Bearer valid"}, **body)
+                    self.assertEqual(result.status_code, 503)
+                    self.assertEqual(result.json()["detail"], "Operator access is not configured")
+                with self.subTest(path=path), patch.dict(os.environ, LEAFVISION_OPERATOR_TOKEN="valid"):
+                    for header in ("", "Basic valid", "Bearer incorrect"):
+                        result = await client.request(method, path, headers={"Authorization": header}, **body)
+                        self.assertEqual(result.status_code, 401)
+                        self.assertEqual(result.headers["WWW-Authenticate"], "Bearer")
+            with patch.dict(os.environ, LEAFVISION_OPERATOR_TOKEN="valid"):
+                result = await client.get("/operator/access", headers={"Authorization": "Bearer valid"})
+                self.assertEqual(result.status_code, 204)
+
     async def test_invalid_uploads(self):
         png = io.BytesIO()
         Image.new("RGB", (3, 3)).save(png, format="PNG")
